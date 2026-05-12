@@ -69,7 +69,7 @@ import {
 } from "lucide-react";
 import { format, addDays } from "date-fns";
 
-const ProfilePage = () => {
+const ProfilePageDisabled = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditing, setIsEditing] = useState(false);
@@ -1100,4 +1100,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default ProfilePageDisabled;
