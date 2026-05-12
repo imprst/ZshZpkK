@@ -6,7 +6,7 @@ import ServicesHomePage from "./pages/ServicesHomePage";
 import ServicesProfilePage from "./pages/ServicesProfilePage";
 import BookingPage from "./pages/BookingPage";
 import MenuPage from "./pages/MenuPage";
-// import ProfilePage from "./pages/ProfilePage"; // DISABLED - see DISABLED_FEATURES.md
+// ProfilePage disabled - see DISABLED_FEATURES.md
 import StaffPortalPage from "./pages/StaffPortalPage";
 import ManagementPage from "./pages/ManagementPage";
 import TravelDeskPage from "./pages/TravelDeskPage";
