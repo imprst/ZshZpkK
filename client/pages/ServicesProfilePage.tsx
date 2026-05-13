@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { supabase } from "../lib/supabase";
@@ -103,7 +103,6 @@ const ServicesProfilePage = () => {
   // Role-based copy templates
   const roleContent = {
     service_provider: {
-      icon: Briefcase,
       badge: "Service Partner",
       greeting: `Welcome back, ${userData.firstName}!`,
       tagline: "Your service excellence continues",
@@ -122,7 +121,6 @@ const ServicesProfilePage = () => {
       refDesc: "For each service provider you refer who completes their first task",
     },
     manager: {
-      icon: Users,
       badge: "Property Manager",
       greeting: `Welcome, ${userData.firstName}!`,
       tagline: "Your management dashboard",
@@ -141,7 +139,6 @@ const ServicesProfilePage = () => {
       refDesc: "For each service provider you recruit and add to your team",
     },
     guest: {
-      icon: User,
       badge: "Guest Member",
       greeting: `Welcome, ${userData.firstName}!`,
       tagline: "Explore our service platform",
@@ -679,11 +676,15 @@ const ServicesProfilePage = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            {roleContent[userRole].icon &&
-              React.createElement(roleContent[userRole].icon, {
-                className: "h-8 w-8 text-sheraton-gold mr-2"
-              })
-            }
+            {userRole === "service_provider" && (
+              <Briefcase className="h-8 w-8 text-sheraton-gold mr-2" />
+            )}
+            {userRole === "manager" && (
+              <Users className="h-8 w-8 text-sheraton-gold mr-2" />
+            )}
+            {userRole === "guest" && (
+              <User className="h-8 w-8 text-sheraton-gold mr-2" />
+            )}
             <Badge className="bg-sheraton-gold text-sheraton-navy px-4 py-2">
               {roleContent[userRole].badge}
             </Badge>
