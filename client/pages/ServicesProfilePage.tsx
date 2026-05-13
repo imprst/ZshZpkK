@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { supabase } from "../lib/supabase";
@@ -64,12 +64,15 @@ import {
 } from "lucide-react";
 import { format, addDays } from "date-fns";
 
+type UserRole = "service_provider" | "manager" | "guest";
+
 const ServicesProfilePage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditing, setIsEditing] = useState(false);
   const [showPerformanceDetails, setShowPerformanceDetails] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [userRole, setUserRole] = useState<UserRole>("guest");
   const saveTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>({});
   const userIdRef = useRef<string | null>(null);
 
@@ -96,6 +99,67 @@ const ServicesProfilePage = () => {
       },
     },
   });
+
+  // Role-based copy templates
+  const roleContent = {
+    service_provider: {
+      icon: Briefcase,
+      badge: "Service Partner",
+      greeting: `Welcome back, ${userData.firstName}!`,
+      tagline: "Your service excellence continues",
+      tierLabel: "Service Partner",
+      dashboard: "Your Performance",
+      recentLabel: "Recent Completions",
+      oppTitle: "Active Opportunities",
+      earnTitle: "Ways to Earn Recognition Points",
+      perfLabel: "Service Performance",
+      tierBenefit: "Service Partner Benefits",
+      nextTierText: "Unlock Next Tier",
+      notifyLabel: "Task Notifications",
+      reportLabel: "Report Updates",
+      alertLabel: "System Alerts",
+      refTitle: "Refer Other Service Providers & Earn",
+      refDesc: "For each service provider you refer who completes their first task",
+    },
+    manager: {
+      icon: Users,
+      badge: "Property Manager",
+      greeting: `Welcome, ${userData.firstName}!`,
+      tagline: "Your management dashboard",
+      tierLabel: "Manager",
+      dashboard: "Team Overview",
+      recentLabel: "Recent Activities",
+      oppTitle: "Team Opportunities",
+      earnTitle: "Team Performance Metrics",
+      perfLabel: "Team Performance",
+      tierBenefit: "Manager Benefits",
+      nextTierText: "Unlock Premium Features",
+      notifyLabel: "Team Task Updates",
+      reportLabel: "Performance Reports",
+      alertLabel: "Team Alerts",
+      refTitle: "Recruit Service Providers & Build Your Team",
+      refDesc: "For each service provider you recruit and add to your team",
+    },
+    guest: {
+      icon: User,
+      badge: "Guest Member",
+      greeting: `Welcome, ${userData.firstName}!`,
+      tagline: "Explore our service platform",
+      tierLabel: "Guest",
+      dashboard: "Your Dashboard",
+      recentLabel: "Recent Activity",
+      oppTitle: "Available Services",
+      earnTitle: "How to Get Started",
+      perfLabel: "Your Activity",
+      tierBenefit: "Member Benefits",
+      nextTierText: "Learn More",
+      notifyLabel: "Service Notifications",
+      reportLabel: "Service Updates",
+      alertLabel: "Important Notices",
+      refTitle: "Share with Friends & Earn Rewards",
+      refDesc: "For each friend you refer who joins",
+    },
+  };
 
   // Save field to database with debounce
   const saveFieldToDatabase = async (fieldName: string, value: string) => {
@@ -153,6 +217,11 @@ const ServicesProfilePage = () => {
             memberSince: profile.created_at ? profile.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
             profilePicture: profile.profile_picture || "",
           }));
+
+          // Determine user role based on profile data
+          const role = (profile.user_type || "guest") as UserRole;
+          setUserRole(role);
+
           setDataLoaded(true);
         }
       } catch (error) {
@@ -170,139 +239,427 @@ const ServicesProfilePage = () => {
     };
   }, []);
 
-  const performanceData = {
-    currentRating: 4.8,
-    ratingOutOf: 5.0,
-    tasksCompleted: 247,
-    tasksInProgress: 12,
-    avgCompletionTime: "2.3 days",
-    qualityScore: 96,
-    nextBadge: "Platinum Service Partner",
-    badgeProgress: 83,
-    pointsToNextBadge: 150,
-    lifetimeTasks: 247,
-    performanceTier: "Gold Service Partner",
-    benefits: [
-      "Priority task allocation",
-      "15% performance bonus",
-      "Featured service listing",
-      "Extended support hours",
-      "Direct account manager",
-      "Training & development access",
-    ],
-    nextTierBenefits: [
-      "All Gold benefits",
-      "25% performance bonus",
-      "Premium service listing",
-      "24/7 dedicated support",
-      "Business development manager",
-      "Custom partnership agreement",
-    ],
+  const getPerformanceData = () => {
+    if (userRole === "service_provider") {
+      return {
+        currentRating: 4.8,
+        ratingOutOf: 5.0,
+        tasksCompleted: 247,
+        tasksInProgress: 12,
+        avgCompletionTime: "2.3 days",
+        qualityScore: 96,
+        nextBadge: "Platinum Service Partner",
+        badgeProgress: 83,
+        pointsToNextBadge: 150,
+        lifetimeTasks: 247,
+        performanceTier: "Gold Service Partner",
+        benefits: [
+          "Priority task allocation",
+          "15% performance bonus",
+          "Featured service listing",
+          "Extended support hours",
+          "Direct account manager",
+          "Training & development access",
+        ],
+        nextTierBenefits: [
+          "All Gold benefits",
+          "25% performance bonus",
+          "Premium service listing",
+          "24/7 dedicated support",
+          "Business development manager",
+          "Custom partnership agreement",
+        ],
+      };
+    } else if (userRole === "manager") {
+      return {
+        currentRating: 4.6,
+        ratingOutOf: 5.0,
+        tasksCompleted: 127,
+        tasksInProgress: 8,
+        avgCompletionTime: "1.8 days",
+        qualityScore: 94,
+        nextBadge: "Premium Manager",
+        badgeProgress: 68,
+        pointsToNextBadge: 220,
+        lifetimeTasks: 127,
+        performanceTier: "Standard Manager",
+        benefits: [
+          "Team management tools",
+          "10% team discount",
+          "Priority support",
+          "Advanced reporting",
+          "Team analytics",
+          "Training resources",
+        ],
+        nextTierBenefits: [
+          "All Standard benefits",
+          "20% team discount",
+          "24/7 premium support",
+          "Custom integrations",
+          "Dedicated account manager",
+          "Custom reporting",
+        ],
+      };
+    } else {
+      return {
+        currentRating: 4.2,
+        ratingOutOf: 5.0,
+        tasksCompleted: 12,
+        tasksInProgress: 2,
+        avgCompletionTime: "3.1 days",
+        qualityScore: 88,
+        nextBadge: "Silver Member",
+        badgeProgress: 45,
+        pointsToNextBadge: 350,
+        lifetimeTasks: 12,
+        performanceTier: "Guest Member",
+        benefits: [
+          "Access to service marketplace",
+          "Member discounts",
+          "Community support",
+          "Reviews and ratings",
+        ],
+        nextTierBenefits: [
+          "All Guest benefits",
+          "Priority booking",
+          "Exclusive services",
+          "Dedicated concierge",
+        ],
+      };
+    }
   };
 
-  const recentActivities = [
-    {
-      id: "1",
-      type: "completion",
-      description: "Task completed - Housekeeping Service",
-      points: "+50 pts",
-      date: "2024-01-15",
-      status: "completed",
-    },
-    {
-      id: "2",
-      type: "completion",
-      description: "Task completed - Maintenance Work",
-      points: "+75 pts",
-      date: "2024-01-14",
-      status: "completed",
-    },
-    {
-      id: "3",
-      type: "review",
-      description: "5-star review received",
-      points: "+25 pts",
-      date: "2024-01-10",
-      status: "completed",
-    },
-    {
-      id: "4",
-      type: "milestone",
-      description: "100 tasks completed milestone",
-      points: "+200 pts",
-      date: "2024-01-08",
-      status: "completed",
-    },
-    {
-      id: "5",
-      type: "referral",
-      description: "Service provider referral bonus",
-      points: "+100 pts",
-      date: "2024-01-05",
-      status: "completed",
-    },
-  ];
+  const performanceData = getPerformanceData();
 
-  const activeOpportunities = [
-    {
-      id: "1",
-      title: "Maintenance Excellence Badge",
-      description: "Complete 20 maintenance tasks with 5-star ratings",
-      progress: 18,
-      total: 20,
-      type: "badge",
-      emoji: "🏆",
-    },
-    {
-      id: "2",
-      title: "Service Partner Bonus",
-      description: "Earn 2% bonus on all tasks this month",
-      validUntil: "2024-02-29",
-      type: "offer",
-      emoji: "💰",
-    },
-    {
-      id: "3",
-      title: "Referral Program",
-      description: "Refer other service providers and earn 500 points each",
-      validUntil: "Ongoing",
-      type: "referral",
-      emoji: "👥",
-    },
-  ];
+  const getRecentActivities = () => {
+    if (userRole === "service_provider") {
+      return [
+        {
+          id: "1",
+          type: "completion",
+          description: "Task completed - Housekeeping Service",
+          points: "+50 pts",
+          date: "2024-01-15",
+          status: "completed",
+        },
+        {
+          id: "2",
+          type: "completion",
+          description: "Task completed - Maintenance Work",
+          points: "+75 pts",
+          date: "2024-01-14",
+          status: "completed",
+        },
+        {
+          id: "3",
+          type: "review",
+          description: "5-star review received",
+          points: "+25 pts",
+          date: "2024-01-10",
+          status: "completed",
+        },
+        {
+          id: "4",
+          type: "milestone",
+          description: "100 tasks completed milestone",
+          points: "+200 pts",
+          date: "2024-01-08",
+          status: "completed",
+        },
+        {
+          id: "5",
+          type: "referral",
+          description: "Service provider referral bonus",
+          points: "+100 pts",
+          date: "2024-01-05",
+          status: "completed",
+        },
+      ];
+    } else if (userRole === "manager") {
+      return [
+        {
+          id: "1",
+          type: "completion",
+          description: "Team member onboarded",
+          points: "+100 pts",
+          date: "2024-01-15",
+          status: "completed",
+        },
+        {
+          id: "2",
+          type: "completion",
+          description: "Team performance report generated",
+          points: "+50 pts",
+          date: "2024-01-14",
+          status: "completed",
+        },
+        {
+          id: "3",
+          type: "review",
+          description: "Team received 5-star rating",
+          points: "+75 pts",
+          date: "2024-01-10",
+          status: "completed",
+        },
+        {
+          id: "4",
+          type: "milestone",
+          description: "50 tasks managed milestone",
+          points: "+150 pts",
+          date: "2024-01-08",
+          status: "completed",
+        },
+        {
+          id: "5",
+          type: "referral",
+          description: "New manager referral bonus",
+          points: "+200 pts",
+          date: "2024-01-05",
+          status: "completed",
+        },
+      ];
+    } else {
+      return [
+        {
+          id: "1",
+          type: "booking",
+          description: "Service booked - Maintenance",
+          points: "+20 pts",
+          date: "2024-01-15",
+          status: "completed",
+        },
+        {
+          id: "2",
+          type: "completion",
+          description: "Service completed",
+          points: "+30 pts",
+          date: "2024-01-14",
+          status: "completed",
+        },
+        {
+          id: "3",
+          type: "review",
+          description: "Review submitted",
+          points: "+15 pts",
+          date: "2024-01-10",
+          status: "completed",
+        },
+        {
+          id: "4",
+          type: "milestone",
+          description: "5 services booked milestone",
+          points: "+100 pts",
+          date: "2024-01-08",
+          status: "completed",
+        },
+        {
+          id: "5",
+          type: "referral",
+          description: "Friend referral bonus",
+          points: "+50 pts",
+          date: "2024-01-05",
+          status: "completed",
+        },
+      ];
+    }
+  };
 
-  const taskEarningActivities = [
-    {
-      activity: "Standard Task Completion",
-      points: "Base rate + quality bonus",
-      icon: CheckCircle,
-    },
-    {
-      activity: "5-Star Reviews",
-      points: "+25 bonus points",
-      icon: Star,
-    },
-    {
-      activity: "On-Time Completion",
-      points: "+10 bonus points",
-      icon: Clock,
-    },
-    {
-      activity: "Milestone Achievements",
-      points: "+200 points per milestone",
-      icon: Target,
-    },
-    {
-      activity: "Professional Photos",
-      points: "+50 bonus points",
-      icon: Camera,
-    },
-    {
-      activity: "Service Provider Referrals",
-      points: "+500 bonus points",
-      icon: Users,
-    },
-  ];
+  const recentActivities = getRecentActivities();
+
+  const getActiveOpportunities = () => {
+    if (userRole === "service_provider") {
+      return [
+        {
+          id: "1",
+          title: "Maintenance Excellence Badge",
+          description: "Complete 20 maintenance tasks with 5-star ratings",
+          progress: 18,
+          total: 20,
+          type: "badge",
+          emoji: "🏆",
+        },
+        {
+          id: "2",
+          title: "Service Partner Bonus",
+          description: "Earn 2% bonus on all tasks this month",
+          validUntil: "2024-02-29",
+          type: "offer",
+          emoji: "💰",
+        },
+        {
+          id: "3",
+          title: "Referral Program",
+          description: "Refer other service providers and earn 500 points each",
+          validUntil: "Ongoing",
+          type: "referral",
+          emoji: "👥",
+        },
+      ];
+    } else if (userRole === "manager") {
+      return [
+        {
+          id: "1",
+          title: "Team Expansion Goal",
+          description: "Recruit 5 service providers to your team",
+          progress: 3,
+          total: 5,
+          type: "badge",
+          emoji: "📈",
+        },
+        {
+          id: "2",
+          title: "Manager Performance Bonus",
+          description: "Achieve 95% team quality score this month",
+          validUntil: "2024-02-29",
+          type: "offer",
+          emoji: "⭐",
+        },
+        {
+          id: "3",
+          title: "Manager Referral Program",
+          description: "Refer other managers and earn 750 points each",
+          validUntil: "Ongoing",
+          type: "referral",
+          emoji: "🤝",
+        },
+      ];
+    } else {
+      return [
+        {
+          id: "1",
+          title: "Loyal Customer Badge",
+          description: "Complete 10 service bookings",
+          progress: 7,
+          total: 10,
+          type: "badge",
+          emoji: "⭐",
+        },
+        {
+          id: "2",
+          title: "Member Discount",
+          description: "Get 10% off your next 3 services",
+          validUntil: "2024-02-29",
+          type: "offer",
+          emoji: "🎁",
+        },
+        {
+          id: "3",
+          title: "Share & Earn",
+          description: "Refer friends and get 50 points per signup",
+          validUntil: "Ongoing",
+          type: "referral",
+          emoji: "💝",
+        },
+      ];
+    }
+  };
+
+  const activeOpportunities = getActiveOpportunities();
+
+  const getTaskEarningActivities = () => {
+    if (userRole === "service_provider") {
+      return [
+        {
+          activity: "Standard Task Completion",
+          points: "Base rate + quality bonus",
+          icon: CheckCircle,
+        },
+        {
+          activity: "5-Star Reviews",
+          points: "+25 bonus points",
+          icon: Star,
+        },
+        {
+          activity: "On-Time Completion",
+          points: "+10 bonus points",
+          icon: Clock,
+        },
+        {
+          activity: "Milestone Achievements",
+          points: "+200 points per milestone",
+          icon: Target,
+        },
+        {
+          activity: "Professional Photos",
+          points: "+50 bonus points",
+          icon: Camera,
+        },
+        {
+          activity: "Service Provider Referrals",
+          points: "+500 bonus points",
+          icon: Users,
+        },
+      ];
+    } else if (userRole === "manager") {
+      return [
+        {
+          activity: "Team Task Completion",
+          points: "Base management fee",
+          icon: CheckCircle,
+        },
+        {
+          activity: "Team Quality Score",
+          points: "+50 bonus points",
+          icon: Star,
+        },
+        {
+          activity: "On-Time Project Delivery",
+          points: "+30 bonus points",
+          icon: Clock,
+        },
+        {
+          activity: "Team Growth Milestones",
+          points: "+150 points per milestone",
+          icon: Target,
+        },
+        {
+          activity: "Performance Reports",
+          points: "+40 bonus points",
+          icon: BarChart3,
+        },
+        {
+          activity: "Manager Referrals",
+          points: "+750 bonus points",
+          icon: Users,
+        },
+      ];
+    } else {
+      return [
+        {
+          activity: "Service Booking",
+          points: "+20 reward points",
+          icon: CheckCircle,
+        },
+        {
+          activity: "Service Review",
+          points: "+15 reward points",
+          icon: Star,
+        },
+        {
+          activity: "On-Time Rating",
+          points: "+10 reward points",
+          icon: Clock,
+        },
+        {
+          activity: "Booking Milestones",
+          points: "+100 points per milestone",
+          icon: Target,
+        },
+        {
+          activity: "Photo Reviews",
+          points: "+25 reward points",
+          icon: Camera,
+        },
+        {
+          activity: "Friend Referrals",
+          points: "+100 reward points",
+          icon: Users,
+        },
+      ];
+    }
+  };
+
+  const taskEarningActivities = getTaskEarningActivities();
 
   const handleSaveProfile = () => {
     setIsEditing(false);
@@ -322,18 +679,22 @@ const ServicesProfilePage = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Briefcase className="h-8 w-8 text-sheraton-gold mr-2" />
+            {roleContent[userRole].icon &&
+              React.createElement(roleContent[userRole].icon, {
+                className: "h-8 w-8 text-sheraton-gold mr-2"
+              })
+            }
             <Badge className="bg-sheraton-gold text-sheraton-navy px-4 py-2">
-              Service Partner
+              {roleContent[userRole].badge}
             </Badge>
           </div>
           {userData.firstName && (
             <h1 className="text-4xl md:text-5xl font-bold text-sheraton-navy mb-4">
-              Welcome back, {userData.firstName}!
+              {roleContent[userRole].greeting}
             </h1>
           )}
           <p className="text-lg text-muted-foreground">
-            Your service excellence continues • {performanceData.performanceTier} Member
+            {roleContent[userRole].tagline} • {performanceData.performanceTier} Member
           </p>
         </div>
 
@@ -421,7 +782,11 @@ const ServicesProfilePage = () => {
                       {performanceData.currentRating}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Service Rating
+                      {userRole === "service_provider"
+                        ? "Service Rating"
+                        : userRole === "manager"
+                        ? "Team Rating"
+                        : "Member Rating"}
                     </div>
                   </div>
 
@@ -465,7 +830,7 @@ const ServicesProfilePage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Zap className="h-5 w-5 text-sheraton-gold" />
-                    Performance Overview
+                    {roleContent[userRole].dashboard}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -531,7 +896,7 @@ const ServicesProfilePage = () => {
                   {/* Active Opportunities */}
                   <div className="space-y-3">
                     <h3 className="font-semibold text-sheraton-navy">
-                      Active Opportunities
+                      {roleContent[userRole].oppTitle}
                     </h3>
                     {activeOpportunities.slice(0, 2).map((opportunity) => (
                       <div
@@ -567,7 +932,7 @@ const ServicesProfilePage = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <History className="h-5 w-5 text-sheraton-gold" />
-                  Recent Activities
+                  {roleContent[userRole].recentLabel}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -627,7 +992,7 @@ const ServicesProfilePage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Star className="h-5 w-5" />
-                    Your Performance
+                    {roleContent[userRole].perfLabel}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -635,7 +1000,13 @@ const ServicesProfilePage = () => {
                     <div className="text-4xl font-bold mb-2">
                       {performanceData.currentRating}
                     </div>
-                    <div className="text-white/80">Service Rating</div>
+                    <div className="text-white/80">
+                      {userRole === "service_provider"
+                        ? "Service Rating"
+                        : userRole === "manager"
+                        ? "Team Rating"
+                        : "Member Rating"}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-3 gap-4 text-center">
@@ -680,7 +1051,7 @@ const ServicesProfilePage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-sheraton-gold" />
-                    {performanceData.performanceTier} Benefits
+                    {roleContent[userRole].tierBenefit}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -721,7 +1092,7 @@ const ServicesProfilePage = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-sheraton-gold" />
-                  Ways to Earn Recognition Points
+                  {roleContent[userRole].earnTitle}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1022,15 +1393,21 @@ const ServicesProfilePage = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-sheraton-gold" />
-                  Refer Service Partners & Earn
+                  {roleContent[userRole].refTitle}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
                   <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
-                  <h3 className="text-xl font-bold mb-2">Earn 500 Points</h3>
+                  <h3 className="text-xl font-bold mb-2">
+                    {userRole === "service_provider"
+                      ? "Earn 500 Points"
+                      : userRole === "manager"
+                      ? "Earn 750 Points"
+                      : "Earn 100 Points"}
+                  </h3>
                   <p className="text-muted-foreground mb-4">
-                    For each service provider you refer who completes their first task
+                    {roleContent[userRole].refDesc}
                   </p>
                   <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
                     <code className="font-mono text-lg">
