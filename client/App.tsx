@@ -6,7 +6,7 @@ import ServicesHomePage from "./pages/ServicesHomePage";
 import ServicesProfilePage from "./pages/ServicesProfilePage";
 import BookingPage from "./pages/BookingPage";
 import MenuPage from "./pages/MenuPage";
-// import ProfilePage from "./pages/ProfilePage"; // DISABLED - see DISABLED_FEATURES.md
+// ProfilePage disabled - see DISABLED_FEATURES.md
 import StaffPortalPage from "./pages/StaffPortalPage";
 import ManagementPage from "./pages/ManagementPage";
 import TravelDeskPage from "./pages/TravelDeskPage";
@@ -38,7 +38,7 @@ function App() {
               <Route path="/" element={<ServicesHomePage />} />
               <Route path="/book" element={<BookingPage />} />
               <Route path="/menu" element={<MenuPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile" element={<ServicesProfilePage />} />
               <Route path="/staff" element={<StaffPortalPage />} />
               <Route path="/management" element={<ManagementPage />} />
               <Route path="/travel" element={<TravelDeskPage />} />

@@ -10,33 +10,61 @@
 - **Dine** (and all its submenu items)
 - **Experience** (and all its submenu items)
 
-### Part 2: Landing Page & Footer Replaced
+### Part 2: Landing Page & Footer Replaced with Services Context
 - **Old guest-focused HomePage**: Disabled but kept intact
 - **Old guest-focused Footer**: Disabled but kept intact
-- **New ProviderHomePage**: Now active as the landing page (/)
-- **New ProviderFooter**: Now active as the main footer
+- **Old Provider prefix naming**: Renamed to "Services" for broader context coverage
+- **New ServicesHomePage**: Now active as the landing page (/)
+- **New ServicesFooter**: Now active as the main footer
+
+### Part 3: Profile Page Replaced with Services Context
+- **Old guest-focused ProfilePage**: Disabled but kept intact (function exported as `ProfilePageDisabled`)
+- **New ServicesProfilePage**: Now active at /profile route
+- **Context change**: From guest-centric to services/operations stakeholder focus
+- **Maintained functionality**: All database connectivity, form edits, and user data synchronization preserved
 
 All code remains intact in the project for future restoration. Routes and pages are preserved but not advertised in the navbar.
 
 ---
 
-## Files Created (New Provider-Focused Pages)
+## Files Created (New Services-Focused Pages)
 
-### 1. `client/pages/ProviderHomePage.tsx` (NEW)
-- **Purpose**: Service provider / property manager focused landing page
+### 1. `client/pages/ServicesHomePage.tsx` (NEW)
+- **Purpose**: Services stakeholder (providers, managers, coordinators) focused landing page
 - **Content Focus**:
   - Task management, performance analytics, resource planning
   - Links to Tasks, Reports, Accounts sections
   - "Experience an Issue?" support form (replicated word-for-word from original)
 - **Status**: NOW ACTIVE as the home page (/)
 
-### 2. `client/components/layout/ProviderFooter.tsx` (NEW)
-- **Purpose**: Service provider / property manager focused footer
+### 2. `client/components/layout/ServicesFooter.tsx` (NEW)
+- **Purpose**: Services stakeholder focused footer
 - **Content Focus**:
   - Management tools and support resources
   - Links to operational dashboards
-  - Service provider terminology and branding
+  - Services operations terminology and branding
 - **Status**: NOW ACTIVE as the main footer
+
+### 3. `client/pages/ServicesProfilePage.tsx` (NEW)
+- **Purpose**: Services stakeholder profile page (replaces guest-focused ProfilePage)
+- **Context**: Addresses providers, managers, and coordinators with services/operations focus
+- **Maintained Features**:
+  - All Supabase database connectivity preserved
+  - Profile data editing (firstName, lastName, email, phone, birthday, location)
+  - Automatic debounced saves to database (500ms delay)
+  - User authentication checks and redirect to login if not authenticated
+  - All tabs and functionality from original ProfilePage
+  - Performance metrics, activity history, tier benefits
+  - Referral program and earning opportunities
+  - User preferences and notification settings
+- **Data Fields**:
+  - Personal info: firstName, lastName, email, phone, birthday, location
+  - Profile picture management
+  - Role type selection (Manager, Service Provider, Coordinator)
+  - Task category preferences
+  - Notification settings (tasks, reports, alerts, newsletter)
+- **Database Sync**: Same real-time sync mechanism as ProfilePage - field updates save automatically
+- **Status**: NOW ACTIVE at /profile route
 
 ---
 
@@ -49,7 +77,7 @@ All code remains intact in the project for future restoration. Routes and pages 
 - **Impact**: Old guest-focused landing page no longer renders at "/"
 - **How to restore**:
   1. Rename `HomePageDisabled` → `HomePage` in App.tsx import
-  2. Update App.tsx to use original `HomePage` instead of `ProviderHomePage`
+  2. Update App.tsx to use original `HomePage` instead of `ServicesHomePage`
   3. Rename Footer back to original
 - **Code preserved**: YES - full component remains intact for restoration
 
@@ -61,15 +89,30 @@ All code remains intact in the project for future restoration. Routes and pages 
 - **How to restore**: Same process as HomePage above
 - **Code preserved**: YES - full component remains intact for restoration
 
-### 3. `client/App.tsx`
+### 3. `client/pages/ProfilePage.tsx`
+
+#### Change: Disable old guest-focused ProfilePage
+- **What was done**: Renamed function from `ProfilePage` to `ProfilePageDisabled`
+- **Impact**: Old guest-focused profile page no longer renders at /profile
+- **Replaced by**: ServicesProfilePage.tsx with services context
+- **How to restore**:
+  1. Rename `ProfilePageDisabled` → `ProfilePage` in ProfilePage.tsx export
+  2. Update App.tsx to use original `ProfilePage` instead of `ServicesProfilePage`
+- **Code preserved**: YES - full component remains intact for restoration
+- **Database interaction**: Remains functional if restored, no schema changes
+
+### 4. `client/App.tsx`
 
 #### Changes Made:
-1. Replaced import: `Footer` → `ProviderFooter` (line 4)
-2. Replaced import: `HomePage` → `ProviderHomePage` (line 5)
-3. Updated route at `/` to use `ProviderHomePage` (line 37)
-4. Updated footer component from `<Footer />` to `<ProviderFooter />` (line 78)
+1. Commented out import: `// import ProfilePage from "./pages/ProfilePage";` (line 13)
+2. Replaced import: `ServicesFooter` (previously ProviderFooter) (line 5)
+3. Replaced import: `ServicesHomePage` (previously ProviderHomePage) (line 6)
+4. Replaced import: `ServicesProfilePage` (new) (line 7)
+5. Updated route at `/` to use `ServicesHomePage` (line 43)
+6. Updated route at `/profile` to use `ServicesProfilePage` (line 45)
+7. Updated footer component from `<Footer />` to `<ServicesFooter />` (line 90)
 
-**Impact**: Platform now displays provider-focused interface for all users
+**Impact**: Platform now displays services-focused interface for all users
 **Status**: Changes are functional and active
 
 ### 4. `client/components/layout/Header.tsx`
@@ -189,8 +232,9 @@ All original code is preserved exactly as it was, making restoration straightfor
 
 ## Current Active Pages
 
-- **Home (`/`)**: ProviderHomePage - provider/service provider focused
-- **Footer**: ProviderFooter - service operations focused
+- **Home (`/`)**: ServicesHomePage - services stakeholder (providers, managers, coordinators) focused
+- **Profile (`/profile`)**: ServicesProfilePage - services stakeholder profile with full database connectivity
+- **Footer**: ServicesFooter - service operations focused
 - **Navbar**: Tasks, Reports, Accounts (Stay, Dine, Experience disabled)
 - **Remaining pages**: All guest-focused pages (Book, Menu, Travel, etc.) still exist and are accessible via direct URL but not linked from navbar
 
